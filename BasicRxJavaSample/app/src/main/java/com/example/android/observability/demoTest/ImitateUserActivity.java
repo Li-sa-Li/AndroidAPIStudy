@@ -15,6 +15,9 @@ import com.example.android.persistence.R;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+
+import io.reactivex.internal.util.BlockingIgnoringReceiver;
 
 public class ImitateUserActivity extends AppCompatActivity {
     private static final String TAG = ImitateUserActivity.class.getSimpleName();
@@ -40,7 +43,7 @@ public class ImitateUserActivity extends AppCompatActivity {
         mUserViewModel = new ImitateViewModelFactory(this).create(ImitateUserViewModel.class);
         Log.i(TAG, "onCreate: " + mUserViewModel + ":userName:" + null);
         mUpdateUser.setOnClickListener(v -> updateUserName());
-        mThreadPool = Executors.newScheduledThreadPool(3, null);
+        mThreadPool = Executors.newScheduledThreadPool(3);
         mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
@@ -54,12 +57,12 @@ public class ImitateUserActivity extends AppCompatActivity {
         mThreadPool.execute(new Runnable() {
             @Override
             public void run() {
+                Log.i(TAG, "run: "+text);
                 mUserViewModel.setUserName(text);
             }
         });
         if (!TextUtils.isEmpty(text)) {
             mUserName.setText(text);
-            mUserViewModel.setUserName(text);
         }
     }
 
