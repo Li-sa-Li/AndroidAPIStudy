@@ -1,19 +1,20 @@
 package com.example.android.observability.demoTest;
 
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.provider.ContactsContract;
+
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.android.persistence.R;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class ImitateUserActivity extends AppCompatActivity {
     private static final String TAG = ImitateUserActivity.class.getSimpleName();
@@ -21,6 +22,8 @@ public class ImitateUserActivity extends AppCompatActivity {
     private EditText mUserNameInput;
     private Button mUpdateUser;
     private ImitateUserViewModel mUserViewModel;
+    private ScheduledExecutorService mThreadPool;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,18 +37,29 @@ public class ImitateUserActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             userName = (String) savedInstanceState.get("user_name");
         }
-        mUserViewModel = new ImitateViewModelFactory().create(ImitateUserViewModel.class);
-        Log.i(TAG, "onCreate: " + mUserViewModel + ":userName:" + mUserViewModel.getUserName());
-        mUserViewModel.setUserName(mUserNameInput.getText().toString());
-
+        mUserViewModel = new ImitateViewModelFactory(this).create(ImitateUserViewModel.class);
+        Log.i(TAG, "onCreate: " + mUserViewModel + ":userName:" + null);
         mUpdateUser.setOnClickListener(v -> updateUserName());
+        mThreadPool = Executors.newScheduledThreadPool(3, null);
+        mThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, mUserViewModel.getUserName());
+            }
+        });
     }
 
     private void updateUserName() {
         final String text = mUserNameInput.getText().toString();
-        mUserViewModel.setUserName(text);
+        mThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                mUserViewModel.setUserName(text);
+            }
+        });
         if (!TextUtils.isEmpty(text)) {
             mUserName.setText(text);
+            mUserViewModel.setUserName(text);
         }
     }
 
@@ -62,37 +76,37 @@ public class ImitateUserActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.i(TAG, "onRestart: " + (mUserViewModel == null ? null : mUserViewModel.getUserName()));
+        Log.i(TAG, "onRestart: " + (mUserViewModel == null ? null : null));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i(TAG, "onPause: " + (mUserViewModel == null ? null : mUserViewModel.getUserName()));
+        Log.i(TAG, "onPause: " + (mUserViewModel == null ? null : null));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG, "onStop mUserViewModel: " + (mUserViewModel == null ? null : mUserViewModel.getUserName()));
+        Log.i(TAG, "onStop mUserViewModel: " + (mUserViewModel == null ? null : null));
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestroy mUserViewModel: " + (mUserViewModel.getUserName()));
+        Log.i(TAG, "onDestroy mUserViewModel: " + (null));
     }
 
     @Override
     protected void onResume() {
-        Log.i(TAG, "onResume: " + (mUserViewModel == null ? null : mUserViewModel.getUserName()));
+        Log.i(TAG, "onResume: " + (mUserViewModel == null ? null : null));
         super.onResume();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart: " + (mUserViewModel == null ? null : mUserViewModel.getUserName()));
+        Log.i(TAG, "onStart: " + (mUserViewModel == null ? null : null));
     }
 
 //    @Override

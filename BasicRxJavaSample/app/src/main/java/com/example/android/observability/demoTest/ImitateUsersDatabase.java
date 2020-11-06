@@ -1,27 +1,28 @@
 package com.example.android.observability.demoTest;
 
-import androidx.annotation.NonNull;
+import android.content.Context;
+
 import androidx.room.Database;
-import androidx.room.DatabaseConfiguration;
-import androidx.room.InvalidationTracker;
+import androidx.room.Room;
 import androidx.room.RoomDatabase;
-import androidx.sqlite.db.SupportSQLiteOpenHelper;
-@Database(entities = ImitateUser.class,version = 1)
-public class ImitateUsersDatabase extends RoomDatabase {
-    @NonNull
-    @Override
-    protected SupportSQLiteOpenHelper createOpenHelper(DatabaseConfiguration config) {
-        return null;
-    }
 
-    @NonNull
-    @Override
-    protected InvalidationTracker createInvalidationTracker() {
-        return null;
-    }
+@Database(entities = {ImitateUser.class}, version = 1,exportSchema = false)
+public abstract class ImitateUsersDatabase extends RoomDatabase {
 
-    @Override
-    public void clearAllTables() {
+    private static ImitateUsersDatabase INSTANCE;
 
+    abstract ImitateUserDao imitateUserDao();
+
+    public static ImitateUsersDatabase getInstance(Context context) {
+        if (INSTANCE == null) {
+            synchronized (ImitateUsersDatabase.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room.databaseBuilder(context, ImitateUsersDatabase.class
+                            , "ImitateSample.db")
+                            .build();
+                }
+            }
+        }
+        return INSTANCE;
     }
 }
