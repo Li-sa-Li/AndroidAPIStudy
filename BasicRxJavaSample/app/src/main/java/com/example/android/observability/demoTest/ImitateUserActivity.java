@@ -1,10 +1,14 @@
 package com.example.android.observability.demoTest;
 
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -17,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
+import io.reactivex.Flowable;
 import io.reactivex.internal.util.BlockingIgnoringReceiver;
 
 public class ImitateUserActivity extends AppCompatActivity {
@@ -26,7 +31,18 @@ public class ImitateUserActivity extends AppCompatActivity {
     private Button mUpdateUser;
     private ImitateUserViewModel mUserViewModel;
     private ScheduledExecutorService mThreadPool;
-
+    private Handler handler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case 1:
+                    if (mUserName != null) {
+                        mUserName.setText(((String) msg.obj));
+                    }
+                    break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,19 +56,17 @@ public class ImitateUserActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             userName = (String) savedInstanceState.get("user_name");
         }
-        mUserViewModel = new ImitateViewModelFactory(this).create(ImitateUserViewModel.class);
-        Log.i(TAG, "onCreate: " + mUserViewModel + ":userName:" + null);
+        ViewModelProvider viewModelProvider = new ViewModelProvider(this,new ImitateViewModelFactory(this));
+        mUserViewModel = viewModelProvider.get(ImitateUserViewModel.class);
+        Log.i(TAG, "onCreate: " + mUserViewModel);
         mUpdateUser.setOnClickListener(v -> updateUserName());
         mThreadPool = Executors.newScheduledThreadPool(3);
-        mThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, mUserViewModel.getUserName());
-            }
-        });
     }
 
     private void updateUserName() {
+
+        Flowable
+
         final String text = mUserNameInput.getText().toString();
         mThreadPool.execute(new Runnable() {
             @Override
@@ -79,37 +93,47 @@ public class ImitateUserActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
-        Log.i(TAG, "onRestart: " + (mUserViewModel == null ? null : null));
+        Log.i(TAG, "onRestart: ");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i(TAG, "onPause: " + (mUserViewModel == null ? null : null));
+        Log.i(TAG, "onPause: ");
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i(TAG, "onStop mUserViewModel: " + (mUserViewModel == null ? null : null));
+        Log.i(TAG, "onStop: ");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i(TAG, "onDestroy mUserViewModel: " + (null));
+        Log.i(TAG, "onDestroy: ");
     }
 
     @Override
     protected void onResume() {
-        Log.i(TAG, "onResume: " + (mUserViewModel == null ? null : null));
         super.onResume();
+        Log.i(TAG, "onResume: ");
+        mThreadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG, "username==="+mUserViewModel.getUserName());
+                Message message = new Message();
+                message.what =1;
+                message.obj = mUserViewModel.getUserName();
+                handler.sendMessage(message);
+            }
+        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(TAG, "onStart: " + (mUserViewModel == null ? null : null));
+        Log.i(TAG, "onStart: ");
     }
 
 //    @Override

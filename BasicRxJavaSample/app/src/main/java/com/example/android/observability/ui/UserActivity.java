@@ -63,6 +63,7 @@ public class UserActivity extends AppCompatActivity {
 
         mViewModelFactory = Injection.provideViewModelFactory(this);
         mViewModel = new ViewModelProvider(this, mViewModelFactory).get(UserViewModel.class);
+        Log.i(TAG, "onCreate: "+mViewModel);
         mUpdateButton.setOnClickListener(v -> updateUserName());
     }
 
