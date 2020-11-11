@@ -1,7 +1,5 @@
 package com.example.android.observability.demoTest;
 
-import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,12 +7,11 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.android.observability.ui.UserViewModel;
 
 public class ImitateViewModelFactory implements ViewModelProvider.Factory {
-    private ImitateUsersDatabase mDataBase;
+    private ImitateUserDataSource mUserDataSource;
 
-    public ImitateViewModelFactory(Context context) {
-        mDataBase = ImitateUsersDatabase.getInstance(context);
+    public ImitateViewModelFactory(ImitateUserDataSource userDataSource) {
+        mUserDataSource = userDataSource;
     }
-
     /**
      * ；泛型好用：可以灵活扩展
      *
@@ -26,7 +23,7 @@ public class ImitateViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(ImitateUserViewModel.class)) {
-            return (T) new ImitateUserViewModel(mDataBase);
+            return (T) new ImitateUserViewModel(mUserDataSource);
         } else if (modelClass.isAssignableFrom(UserViewModel.class)) {
 //            return (T) new UserViewModel()
         }

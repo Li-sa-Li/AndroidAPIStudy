@@ -1,6 +1,7 @@
 package com.example.android.observability.demoTest;
 
 
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,12 +18,10 @@ import android.widget.TextView;
 
 import com.example.android.persistence.R;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-
 import io.reactivex.Flowable;
-import io.reactivex.internal.util.BlockingIgnoringReceiver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class ImitateUserActivity extends AppCompatActivity {
     private static final String TAG = ImitateUserActivity.class.getSimpleName();
@@ -30,19 +29,7 @@ public class ImitateUserActivity extends AppCompatActivity {
     private EditText mUserNameInput;
     private Button mUpdateUser;
     private ImitateUserViewModel mUserViewModel;
-    private ScheduledExecutorService mThreadPool;
-    private Handler handler = new Handler(){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-            switch (msg.what){
-                case 1:
-                    if (mUserName != null) {
-                        mUserName.setText(((String) msg.obj));
-                    }
-                    break;
-            }
-        }
-    };
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,25 +43,24 @@ public class ImitateUserActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             userName = (String) savedInstanceState.get("user_name");
         }
-        ViewModelProvider viewModelProvider = new ViewModelProvider(this,new ImitateViewModelFactory(this));
+        final ImitateViewModelFactory imitateViewModelFactory = ImitateInjection.provideImitateViewModelFactory(this);
+        ViewModelProvider viewModelProvider = new ViewModelProvider(this, imitateViewModelFactory);
         mUserViewModel = viewModelProvider.get(ImitateUserViewModel.class);
         Log.i(TAG, "onCreate: " + mUserViewModel);
         mUpdateUser.setOnClickListener(v -> updateUserName());
-        mThreadPool = Executors.newScheduledThreadPool(3);
     }
 
     private void updateUserName() {
 
-        Flowable
-
         final String text = mUserNameInput.getText().toString();
-        mThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "run: "+text);
-                mUserViewModel.setUserName(text);
-            }
-        });
+        compositeDisposable.add(Flowable.just(text)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(s -> {
+                    if (mUserViewModel != null) {
+                        mUserViewModel.setUserName(s);
+                    }
+                }));
         if (!TextUtils.isEmpty(text)) {
             mUserName.setText(text);
         }
@@ -112,22 +98,19 @@ public class ImitateUserActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy: ");
+        if (compositeDisposable != null) {
+            compositeDisposable.clear();
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume: ");
-        mThreadPool.execute(new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "username==="+mUserViewModel.getUserName());
-                Message message = new Message();
-                message.what =1;
-                message.obj = mUserViewModel.getUserName();
-                handler.sendMessage(message);
-            }
-        });
+        compositeDisposable.add(Flowable.just(mUserViewModel.getUserName())
+                .observeOn(Schedulers.io())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(s -> mUserName.setText(s)));
     }
 
     @Override

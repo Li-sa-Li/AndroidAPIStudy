@@ -5,20 +5,19 @@ import android.util.Log;
 import androidx.lifecycle.ViewModel;
 
 public class ImitateUserViewModel extends ViewModel {
-    private ImitateUsersDatabase mDatabase;
+    private ImitateUserDataSource mDataSource;
 
-    public ImitateUserViewModel(ImitateUsersDatabase dataSource) {
-        mDatabase = dataSource;
+    public ImitateUserViewModel(ImitateUserDataSource dataSource) {
+        mDataSource = dataSource;
     }
 
     public String getUserName() {
-        final ImitateUser imitateUser = mDatabase.imitateUserDao().getImitateUser();
-        Log.i("ImitateUserActivity", "getUserName: " + imitateUser.getUserName());
-        return imitateUser.getUserName();
+        Log.i("ImitateUserActivity", "getUserName: " + mDataSource.getUser().getUserName());
+        return mDataSource.getUser().getUserName();
     }
 
     public void setUserName(String userName) {
         Log.i("ImitateUserActivity", "setUserName: " + userName);
-        mDatabase.imitateUserDao().insertImitateUser(new ImitateUser("1",userName));
+        mDataSource.insertOrUpdateUser(new ImitateUser("1",userName));
     }
 }
