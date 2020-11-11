@@ -1,11 +1,14 @@
 package com.example.android.observability.demoTest;
 
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+
 public interface ImitateUserDataSource {
 
-    ImitateUser getUser();
+    Flowable<ImitateUser> getUser();
 
-    void insertOrUpdateUser(ImitateUser imitateUser);
+    Completable insertOrUpdateUser(ImitateUser imitateUser);
 
     void deleteAllUsers();
 }

@@ -53,14 +53,10 @@ public class ImitateUserActivity extends AppCompatActivity {
     private void updateUserName() {
 
         final String text = mUserNameInput.getText().toString();
-        compositeDisposable.add(Flowable.just(text)
-                .observeOn(AndroidSchedulers.mainThread())
+        compositeDisposable.add(mUserViewModel.setUserName(text)
                 .subscribeOn(Schedulers.io())
-                .subscribe(s -> {
-                    if (mUserViewModel != null) {
-                        mUserViewModel.setUserName(s);
-                    }
-                }));
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> mUpdateUser.setEnabled(false), throwable -> Log.i(TAG, "Unable to update user name ", throwable)));
         if (!TextUtils.isEmpty(text)) {
             mUserName.setText(text);
         }
@@ -107,10 +103,10 @@ public class ImitateUserActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.i(TAG, "onResume: ");
-        compositeDisposable.add(Flowable.just(mUserViewModel.getUserName())
+        compositeDisposable.add(mUserViewModel.getUserName()
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> mUserName.setText(s)));
+                .subscribe(s -> mUserName.setText(s), throwable -> Log.i(TAG, "Unable to get user name ", throwable)));
     }
 
     @Override

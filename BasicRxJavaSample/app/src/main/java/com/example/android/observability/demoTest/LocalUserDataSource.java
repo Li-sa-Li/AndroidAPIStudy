@@ -1,6 +1,7 @@
 package com.example.android.observability.demoTest;
 
-import android.content.Context;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 
 public class LocalUserDataSource implements ImitateUserDataSource {
     private ImitateUserDao mUserDao;
@@ -10,13 +11,13 @@ public class LocalUserDataSource implements ImitateUserDataSource {
     }
 
     @Override
-    public ImitateUser getUser() {
-        return mUserDao.getImitateUser();
+    public Flowable<ImitateUser> getUser() {
+       return mUserDao.getImitateUser();
     }
 
     @Override
-    public void insertOrUpdateUser(ImitateUser imitateUser) {
-        mUserDao.insertImitateUser(imitateUser);
+    public Completable insertOrUpdateUser(ImitateUser imitateUser) {
+        return mUserDao.insertImitateUser(imitateUser);
     }
 
     @Override
