@@ -1,9 +1,11 @@
-package com.example.android.observability.demoTest;
+package com.example.android.observability.demoTest.ui;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.android.observability.demoTest.ImitateUserDataSource;
+import com.example.android.observability.demoTest.ui.ImitateUserViewModel;
 import com.example.android.observability.ui.UserViewModel;
 
 public class ImitateViewModelFactory implements ViewModelProvider.Factory {

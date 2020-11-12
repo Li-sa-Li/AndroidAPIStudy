@@ -1,4 +1,4 @@
-package com.example.android.observability.demoTest;
+package com.example.android.observability.demoTest.persisitence;
 
 import android.content.Context;
 
@@ -11,7 +11,7 @@ public abstract class ImitateUsersDatabase extends RoomDatabase {
 
     private static ImitateUsersDatabase INSTANCE;
 
-    abstract ImitateUserDao imitateUserDao();
+    public abstract ImitateUserDao imitateUserDao();
 
     public static ImitateUsersDatabase getInstance(Context context) {
         if (INSTANCE == null) {

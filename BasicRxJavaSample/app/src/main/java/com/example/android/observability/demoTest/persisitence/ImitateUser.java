@@ -1,4 +1,4 @@
-package com.example.android.observability.demoTest;
+package com.example.android.observability.demoTest.persisitence;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

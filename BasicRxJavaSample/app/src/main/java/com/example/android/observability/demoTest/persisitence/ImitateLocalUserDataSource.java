@@ -1,12 +1,16 @@
-package com.example.android.observability.demoTest;
+package com.example.android.observability.demoTest.persisitence;
+
+import com.example.android.observability.demoTest.ImitateUserDataSource;
+import com.example.android.observability.demoTest.persisitence.ImitateUser;
+import com.example.android.observability.demoTest.persisitence.ImitateUserDao;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 
-public class LocalUserDataSource implements ImitateUserDataSource {
+public class ImitateLocalUserDataSource implements ImitateUserDataSource {
     private ImitateUserDao mUserDao;
 
-    public LocalUserDataSource(ImitateUserDao imitateUserDao) {
+    public ImitateLocalUserDataSource(ImitateUserDao imitateUserDao) {
         mUserDao = imitateUserDao;
     }
 
