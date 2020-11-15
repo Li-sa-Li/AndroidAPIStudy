@@ -19,7 +19,7 @@ import io.reactivex.schedulers.Schedulers
 
 class ImitateUserActivity : AppCompatActivity() {
 
-    var compositeDisposable: CompositeDisposable = CompositeDisposable()
+    val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private lateinit var providerFactory: ImitateViewModelFactory
 
     private val imitateUserViewModel: ImitateUserViewModel by viewModels { providerFactory }
