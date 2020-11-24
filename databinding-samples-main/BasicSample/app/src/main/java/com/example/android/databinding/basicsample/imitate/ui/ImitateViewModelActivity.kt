@@ -9,13 +9,15 @@ import com.example.android.databinding.basicsample.databinding.ImitateViewmodelP
 import com.example.android.databinding.basicsample.imitate.data.ImitateProfileObservableViewModel
 
 class ImitateViewModelActivity : AppCompatActivity() {
+    private lateinit var imitateProfileObservableViewModel:ImitateProfileObservableViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var contentView: ImitateViewmodelProfileBinding = DataBindingUtil.setContentView(this, R.layout.imitate_viewmodel_profile)
-        contentView.viewModel = ImitateProfileObservableViewModel("li", "lisa")
+         imitateProfileObservableViewModel = ImitateProfileObservableViewModel("li", "lisa")
+        contentView.viewModel = imitateProfileObservableViewModel
     }
 
     fun onLikeClick(view: View){
-
+        imitateProfileObservableViewModel.likes++
     }
 }
