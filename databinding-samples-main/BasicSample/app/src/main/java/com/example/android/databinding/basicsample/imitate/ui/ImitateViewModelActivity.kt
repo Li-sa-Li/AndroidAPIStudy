@@ -1,6 +1,7 @@
 package com.example.android.databinding.basicsample.imitate.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -18,6 +19,8 @@ class ImitateViewModelActivity : AppCompatActivity() {
     }
 
     fun onLikeClick(view: View){
-        imitateProfileObservableViewModel.likes++
+        Log.i("likes", "onLikeClick: ")
+        imitateProfileObservableViewModel.onLikes()
+        Log.i("likes", "onLikeClick: "+imitateProfileObservableViewModel.likes.get())
     }
 }
