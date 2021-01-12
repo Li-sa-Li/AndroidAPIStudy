@@ -18,12 +18,14 @@ package com.google.samples.apps.sunflower.imitate
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import com.google.samples.apps.sunflower.R
 
 // TODO: 2020/12/28 1,两个页面显示数据，一个是花朵列表；一个是自己种养的花朵；2，详情页面；3，数据的存储；4，viewpager tab页
 class ImitateGardenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("test00", "onCreateView: ")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_imitate_garden)
         var leftTab = findViewById<Button>(R.id.left_tab)
